@@ -6,6 +6,7 @@ require (
 	github.com/danielgtaylor/huma/v2 v2.24.0
 	github.com/go-chi/chi/v5 v5.1.0
 	go.bug.st/serial v1.6.2
+	golang.org/x/text v0.19.0
 )
 
 require (

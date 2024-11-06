@@ -38,47 +38,9 @@ func main() {
 		fmt.Println("Connected successfully to serial ports")
 
 		router := chi.NewMux()
-		api := humachi.New(router, huma.DefaultConfig("Häkkerikoda Projector API", "0.1.0"))
+		api := humachi.New(router, huma.DefaultConfig("Häkkerikoda Projector API", "0.2.0"))
 
-		huma.Post(api, "/power/set/on", func(ctx context.Context, input *struct{}) (*RawSendOutput, error) {
-			WriteSerial(port, []byte{0xbe, 0xef, 0x03, 0x06, 0x00, 0xba, 0xd2, 0x01, 0x00, 0x00, 0x60, 0x01, 0x00})
-			resp := &RawSendOutput{}
-			result := ReadSerial(port)
-			resp.Body.Message = string(result)
-			return resp, nil
-		})
-
-		huma.Post(api, "/power/set/off", func(ctx context.Context, input *struct{}) (*RawSendOutput, error) {
-			WriteSerial(port, []byte{0xbe, 0xef, 0x03, 0x06, 0x00, 0x2a, 0xd3, 0x01, 0x00, 0x00, 0x60, 0x00, 0x00})
-			resp := &RawSendOutput{}
-			result := ReadSerial(port)
-			resp.Body.Message = string(result)
-			return resp, nil
-		})
-
-		huma.Get(api, "/power/get", func(ctx context.Context, input *struct{}) (*RawSendOutput, error) {
-			WriteSerial(port, []byte{0xbe, 0xef, 0x03, 0x06, 0x00, 0x19, 0xd3, 0x02, 0x00, 0x00, 0x60, 0x00, 0x00})
-			resp := &RawSendOutput{}
-			result := ReadSerial(port)
-			resp.Body.Message = string(result)
-			return resp, nil
-		})
-
-		huma.Post(api, "/input/set/rgb1", func(ctx context.Context, input *struct{}) (*RawSendOutput, error) {
-			WriteSerial(port, []byte{0xbe, 0xef, 0x03, 0x06, 0x00, 0xfe, 0xd2, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00})
-			resp := &RawSendOutput{}
-			result := ReadSerial(port)
-			resp.Body.Message = string(result)
-			return resp, nil
-		})
-
-		huma.Post(api, "/input/set/rgb2", func(ctx context.Context, input *struct{}) (*RawSendOutput, error) {
-			WriteSerial(port, []byte{0xbe, 0xef, 0x03, 0x06, 0x00, 0x3e, 0xd0, 0x01, 0x00, 0x00, 0x20, 0x04, 0x00})
-			resp := &RawSendOutput{}
-			result := ReadSerial(port)
-			resp.Body.Message = string(result)
-			return resp, nil
-		})
+		CreateRoutes(api, port, Commands)
 
 		fmt.Println("Routes registered")
 
@@ -96,7 +58,7 @@ func main() {
 
 		// Tell the CLI how to stop your server.
 		hooks.OnStop(func() {
-			// Give the server 5 seconds to gracefully shut down, then give up.
+			// Give the server 15 seconds to gracefully shut down, then give up.
 			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 			defer cancel()
 			server.Shutdown(ctx)
