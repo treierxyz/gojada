@@ -1,0 +1,48 @@
+name: Go Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags like v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Build for Linux x64
+      run: GOOS=linux GOARCH=amd64 go build -v -o gojada-linux-amd64
+
+    - name: Build for Linux ARMv7
+      run: GOOS=linux GOARCH=arm GOARM=7 go build -v -o gojada-linux-armv7
+
+    - name: Build for Linux ARM64
+      run: GOOS=linux GOARCH=arm64 go build -v -o gojada-linux-arm64
+
+    - name: Build for macOS x64
+      run: GOOS=darwin GOARCH=amd64 go build -v -o gojada-darwin-amd64
+
+    - name: Build for macOS Apple Silicon
+      run: GOOS=darwin GOARCH=arm64 go build -v -o gojada-darwin-arm64
+
+    - name: Build for Windows x64
+      run: GOOS=windows GOARCH=amd64 go build -v -o gojada-windows-amd64.exe
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          gojada-linux-amd64
+          gojada-linux-armv7
+          gojada-linux-arm64
+          gojada-darwin-amd64
+          gojada-darwin-arm64
+          gojada-windows-amd64.exe
