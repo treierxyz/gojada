@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/treierxyz/hk-projector-api/devices"
-	"github.com/treierxyz/hk-projector-api/serialhelper"
+	"github.com/treierxyz/gojada/devices"
+	"github.com/treierxyz/gojada/serialhelper"
 	"go.bug.st/serial"
 )
 

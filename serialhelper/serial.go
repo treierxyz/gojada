@@ -1,7 +1,7 @@
 package serialhelper
 
 import (
-	"github.com/treierxyz/hk-projector-api/devices"
+	"github.com/treierxyz/gojada/devices"
 	"go.bug.st/serial"
 )
 

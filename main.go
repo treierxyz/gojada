@@ -10,9 +10,8 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/danielgtaylor/huma/v2/humacli"
 	"github.com/go-chi/chi/v5"
-	"github.com/treierxyz/hk-projector-api/devices/x55"
-	"github.com/treierxyz/hk-projector-api/route"
-	"github.com/treierxyz/hk-projector-api/serialhelper"
+	"github.com/treierxyz/gojada/route"
+	"github.com/treierxyz/gojada/serialhelper"
 
 	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
 )
@@ -20,20 +19,23 @@ import (
 // Options for the CLI.
 type Options struct {
 	Port   int    `help:"Port to listen on" short:"p" default:"8888"`
-	Serial string `help:"Path of emulated device serial" short:"E" default:"/dev/ttyUSB0"`
+	Path   string `help:"Path of serial device" short:"E" default:"/dev/ttyUSB0"`
+	Device string `help:"Device type" short:"d" default:"x55"`
 }
 
 func main() {
 	// Create a CLI app which takes a port option.
 	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
+		device := Devices[options.Device]
+
 		fmt.Println("Connecting to serial...")
-		port := serialhelper.ConnectSerial(options.Serial, x55.Device.Settings())
+		port := serialhelper.ConnectSerial(options.Path, device.Settings())
 		fmt.Println("Connected successfully to serial ports")
 
 		router := chi.NewMux()
-		api := humachi.New(router, huma.DefaultConfig("Häkkerikoda Projector API", "0.2.0"))
+		api := humachi.New(router, huma.DefaultConfig("gojada API", "v0.4.0"))
 
-		route.CreateRoutes(api, port, x55.Device)
+		route.CreateRoutes(api, port, device)
 
 		fmt.Println("Routes registered")
 

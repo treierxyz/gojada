@@ -1,4 +1,4 @@
-module github.com/treierxyz/hk-projector-api
+module github.com/treierxyz/gojada
 
 go 1.22.7
 

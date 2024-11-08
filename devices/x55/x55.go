@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/treierxyz/hk-projector-api/devices"
+	"github.com/treierxyz/gojada/devices"
 	"go.bug.st/serial"
 )
 
