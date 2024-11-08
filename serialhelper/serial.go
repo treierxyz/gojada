@@ -1,21 +1,16 @@
-package main
+package serialhelper
 
 import (
-	"time"
-
+	"github.com/treierxyz/hk-projector-api/devices"
 	"go.bug.st/serial"
 )
 
-var mode *serial.Mode = &serial.Mode{
-	BaudRate: 19200,
-}
-
-func ConnectSerial(path string) serial.Port {
-	port, err := serial.Open(path, mode)
+func ConnectSerial(path string, settings devices.SerialDeviceSettings) serial.Port {
+	port, err := serial.Open(path, &settings.Mode)
 	if err != nil {
 		panic(err)
 	}
-	err = port.SetReadTimeout(50 * time.Millisecond)
+	err = port.SetReadTimeout(settings.ReadTimeout)
 	if err != nil {
 		panic(err)
 	}

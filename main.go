@@ -10,6 +10,9 @@ import (
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/danielgtaylor/huma/v2/humacli"
 	"github.com/go-chi/chi/v5"
+	"github.com/treierxyz/hk-projector-api/devices/x55"
+	"github.com/treierxyz/hk-projector-api/route"
+	"github.com/treierxyz/hk-projector-api/serialhelper"
 
 	_ "github.com/danielgtaylor/huma/v2/formats/cbor"
 )
@@ -20,27 +23,17 @@ type Options struct {
 	Serial string `help:"Path of emulated device serial" short:"E" default:"/dev/ttyUSB0"`
 }
 
-type RawSendInput struct {
-	Message string `path:"message" maxLength:"300" example:"world" doc:"Message to send"`
-}
-
-type RawSendOutput struct {
-	Body struct {
-		Message string `json:"message" example:"Hello world" doc:"Device reply"`
-	}
-}
-
 func main() {
 	// Create a CLI app which takes a port option.
 	cli := humacli.New(func(hooks humacli.Hooks, options *Options) {
 		fmt.Println("Connecting to serial...")
-		port := ConnectSerial(options.Serial)
+		port := serialhelper.ConnectSerial(options.Serial, x55.Device.Settings())
 		fmt.Println("Connected successfully to serial ports")
 
 		router := chi.NewMux()
 		api := humachi.New(router, huma.DefaultConfig("Häkkerikoda Projector API", "0.2.0"))
 
-		CreateRoutes(api, port, Commands)
+		route.CreateRoutes(api, port, x55.Device)
 
 		fmt.Println("Routes registered")
 
@@ -63,7 +56,7 @@ func main() {
 			defer cancel()
 			server.Shutdown(ctx)
 			fmt.Println("Disconnecting from serial...")
-			DisconnectSerial(port)
+			serialhelper.DisconnectSerial(port)
 			fmt.Println("Closed server successfully")
 		})
 	})
